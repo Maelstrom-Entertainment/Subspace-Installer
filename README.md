@@ -20,7 +20,6 @@ In order to generate a token, you will need to create a [Fine Grained Personal A
 Navigate to a folder meant to contain the Subspace app (ie - `/opt/var/Subspace`) and run:
 
 ```bash
-# Executes the script in the current context
 source <(curl -sSfL https://raw.githubusercontent.com/Maelstrom-Entertainment/Subspace-Installer/main/installer.sh)
 ```
 
