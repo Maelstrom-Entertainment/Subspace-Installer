@@ -11,11 +11,12 @@ install_package() {
 }
 
 readonly dotenv="github.env"
-readonly base_url="https://raw.githubusercontent.com/$org/$repo/$branch"
 readonly branch="main"
 readonly files=(app.sh auth.sh build.sh deploy.sh install.sh project.sh pull.sh restart.sh server.sh)
-readonly org="Maelstrom-Entertainment"
 readonly repo="Subspace-Scripts"
+
+readonly base_url="https://raw.githubusercontent.com/$org/$repo/$branch"
+readonly org="Maelstrom-Entertainment"
 
 readonly project_root="$(pwd)"
 readonly scripts_dir="$project_root/scripts"
