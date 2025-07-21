@@ -15,8 +15,8 @@ readonly branch="main"
 readonly files=(app.sh auth.sh build.sh deploy.sh install.sh project.sh pull.sh restart.sh server.sh)
 readonly repo="Subspace-Scripts"
 
-readonly base_url="https://raw.githubusercontent.com/$org/$repo/$branch"
 readonly org="Maelstrom-Entertainment"
+readonly base_url="https://raw.githubusercontent.com/$org/$repo/$branch"
 
 readonly project_root="$(pwd)"
 readonly scripts_dir="$project_root/scripts"
