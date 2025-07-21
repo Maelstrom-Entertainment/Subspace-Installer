@@ -21,7 +21,6 @@ readonly base_url="https://raw.githubusercontent.com/$org/$repo/$branch"
 readonly project_root="$(pwd)"
 readonly scripts_dir="$project_root/scripts"
 readonly modules_dir="$scripts_dir/modules"
-readonly modules_dir="./scripts/modules"
 
 echo "📦 Bootstrapping Subspace environment ..."
 
