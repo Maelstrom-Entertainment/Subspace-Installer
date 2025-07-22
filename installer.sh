@@ -2,6 +2,7 @@
 
 set -euo pipefail
 
+# Installer script for packages
 install_package() {
   if ! command -v "$1" &>/dev/null; then
     echo "Installing $1 ..."
@@ -9,6 +10,8 @@ install_package() {
     sudo apt-get install -y "$1"
   fi
 }
+
+## VARIABLES ##
 
 readonly dotenv="github.env"
 readonly branch="main"
@@ -22,11 +25,13 @@ readonly project_root="$(pwd)"
 readonly scripts_dir="$project_root/scripts"
 readonly modules_dir="$scripts_dir/modules"
 
+## DEPDENDENCIES ##
+
 echo "📦 Bootstrapping Subspace environment ..."
 
 echo "📁 Installing into: $project_root"
 
-# Step 2: Install base dependencies
+# Install base dependencies
 echo "🔧 Checking required packages ..."
 
 install_package curl
@@ -36,10 +41,12 @@ install_package direnv
 shell_rc="$HOME/.bashrc"
 shell_name="$(basename "$SHELL")"
 
+# Override for zsh shell
 if [[ "$shell_name" == "zsh" ]]; then
   shell_rc="$HOME/.zshrc"
 fi
 
+# Adds direnv hook if not already present
 if ! grep -q 'direnv hook' "$shell_rc"; then
   echo "🔧 Adding direnv hook to $shell_rc"
   echo 'eval "$(direnv hook bash)"' >> "$shell_rc"
@@ -47,13 +54,15 @@ fi
 
 # Create .envrc for local PATH
 if [ ! -f "$project_root/.envrc" ]; then
-  echo 'export PATH="./scripts:$PATH"' > "$project_root/.envrc"
+  echo 'PATH_add scripts' > "$project_root/.envrc"
   echo "🔐 Created .envrc and added local scripts to PATH"
 else
   echo "📄 .envrc already exists — not overwriting"
 fi
 
 direnv allow
+
+## GITHUB AUTHENTICATION ##
 
 # Prompt for GitHub username
 read -rp "👤 Enter your GitHub username: " expected_user
@@ -64,6 +73,7 @@ echo
 
 # Validate token
 echo "🔍 Validating token ..."
+
 user_response=$(curl -s -H "Authorization: token $TOKEN" https://api.github.com/user)
 github_login=$(echo "$user_response" | grep '"login"' | cut -d '"' -f4)
 
@@ -84,6 +94,8 @@ echo "💾 Saving credentials to $dotenv"
   echo "GITHUB_LOGIN=\"$github_login\""
 } > "$dotenv"
 
+## DOWNLOAD MODULES ##
+
 echo "📁 Downloading Subspace modules from $repo@$branch ..."
 
 # Create output folder
@@ -99,8 +111,9 @@ for file in "${files[@]}"; do
   chmod +x "$out_path"
 done
 
-curl -sSfL -H "Authorization: token $TOKEN" "$base_url/subspace.sh" -o "$scripts_dir/subspace.sh"
-chmod +x "$scripts_dir/subspace.sh"
+#Download the main subspace script
+curl -sSfL -H "Authorization: token $TOKEN" "$base_url/subspace.sh" -o "$scripts_dir/subspace"
+chmod +x "$scripts_dir/subspace"
 
 echo
 echo "✅ Modules downloaded to $modules_dir"
