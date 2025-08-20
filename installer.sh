@@ -107,7 +107,12 @@ for file in "${files[@]}"; do
 
   echo "⬇️  Fetching $file ..."
   
-  curl -sSfL -H "Authorization: token $TOKEN" "$base_url/modules/$file" -o "$out_path"
+  if ! curl -sSfL -H "Authorization: token $TOKEN" \
+      "$base_url/modules/$file" -o "$out_path"; then
+    echo "❌ Failed to fetch $file. Check your token or network."
+    exit 1
+  fi
+
   chmod +x "$out_path"
 done
 

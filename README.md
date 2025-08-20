@@ -13,7 +13,13 @@ The Subspace Installer will ensure the server has the required prerequisites in 
 
 You will be asked to authenticate as a Github User that belongs to the Maelstrom Entertainment organization on Github. This is required in order to ensure that you are part of the organization and have access to the required repo's for the next step.
 
-In order to generate a token, you will need to create a [Fine Grained Personal Access Token](https://github.com/settings/personal-access-tokens/new) in your Github Settings -> Developer Settings area. Ensure `Read-Only` access on the `Contents` section of `Repository Settings` is the only access granted.
+In order to generate a token, you will need to create a [Fine Grained Personal Access Token](https://github.com/settings/personal-access-tokens/new) in your Github Settings -> Developer Settings area. You can then follow these steps to make a properly scoped token:
+
+- Resource owner: `Maelstrom-Entertainment`
+- Select `All Repositories`
+- In the `Add Permissions` dropdown, click on `Contents`
+- The `Contents` entry should be set to `Read-only`
+- You can now `Generate Token`
 
 ### Download scripts on target machine
 
@@ -36,5 +42,5 @@ subspace install
 or, if you already know which projects you want to install:
 
 ```bash
-subspace install -p "Github Repo Name" "Github Repo Name" # etc
+subspace install -p "Github Repo Name" "Github Repo Name"
 ```
