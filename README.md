@@ -2,10 +2,9 @@
 
 The Subspace Installer will ensure the server has the required prerequisites in order to install Subspace and setup Github authentication.
 
-- Prerequisites
-  1. [Authenticate Github user](#authenticate-github-user)
-  2. [Download scripts on target machine](#download-scripts-on-target-machine)
-  3. [Run installer scripts](#run-installer-scripts)
+1. [Authenticate Github user](#authenticate-github-user)
+2. [Download scripts on target machine](#download-scripts-on-target-machine)
+3. [Run installer scripts](#run-installer-scripts)
 
 ## Prerequisites
 
@@ -26,10 +25,10 @@ In order to generate a token, you will need to create a [Fine Grained Personal A
 Navigate to a folder meant to contain the Subspace app (ie - `/opt/var/Subspace`) and run:
 
 ```bash
-source <(curl -sSfL https://raw.githubusercontent.com/Maelstrom-Entertainment/Subspace-Installer/main/installer.sh)
+bash <(curl -sSfL https://raw.githubusercontent.com/Maelstrom-Entertainment/Subspace-Installer/main/installer.sh)
 ```
 
-After you successfully run that command, you should have full access to the `subspace` command while in the folder, and can use that command to start populating your Subspace projects.
+After you successfully run that command, you will be provided a command to restart your terminal. Alternatively, you can just open another terminal. After that, you should have full access to the `subspace` command while in the folder, and can use that command to start populating your Subspace projects.
 
 ### Run Installer Scripts
 

@@ -25,7 +25,13 @@ readonly project_root="$(pwd)"
 readonly scripts_dir="$project_root/scripts"
 readonly modules_dir="$scripts_dir/modules"
 
-## DEPDENDENCIES ##
+readonly RED="\033[0;31m"
+readonly GREEN="\033[0;32m"
+readonly YELLOW="\033[1;33m"
+readonly BLUE="\033[0;34m"
+readonly NC="\033[0m"   # No Color
+
+## DEPENDENCIES ##
 
 echo "📦 Bootstrapping Subspace environment ..."
 
@@ -37,13 +43,27 @@ echo "🔧 Checking required packages ..."
 install_package curl
 install_package direnv
 
-# Set up direnv hook in user's shell
-shell_rc="$HOME/.bashrc"
 shell_name="$(basename "$SHELL")"
 
-# Override for zsh shell
-if [[ "$shell_name" == "zsh" ]]; then
-  shell_rc="$HOME/.zshrc"
+# Detect the shell
+case "$shell_name" in
+  bash)
+      shell_rc="$HOME/.bashrc"
+      ;;
+  zsh)
+      shell_rc="$HOME/.zshrc"
+      ;;
+  # Add any other shells here
+  *)
+      shell_rc=""
+      ;;
+esac
+
+# Ensure the shell exists
+if [[ -n "$shell_rc" ]]; then
+    echo -e "${RED}Could not detect shell config file."
+    echo -e "Please manually add direnv hook to your shell.${NC}"
+    exit 1
 fi
 
 # Adds direnv hook if not already present
@@ -52,12 +72,12 @@ if ! grep -q 'direnv hook' "$shell_rc"; then
   echo 'eval "$(direnv hook bash)"' >> "$shell_rc"
 fi
 
-# Create .envrc for local PATH
+# Create .envrc for PATH
 if [ ! -f "$project_root/.envrc" ]; then
   echo 'PATH_add scripts' > "$project_root/.envrc"
-  echo "🔐 Created .envrc and added local scripts to PATH"
+  echo "🔐 Created .envrc and added scripts to PATH"
 else
-  echo "📄 .envrc already exists — not overwriting"
+  echo -e "📄 ${YELLOW}.envrc already exists — not overwriting${NC}"
 fi
 
 direnv allow
@@ -78,9 +98,9 @@ user_response=$(curl -s -H "Authorization: token $TOKEN" https://api.github.com/
 github_login=$(echo "$user_response" | grep '"login"' | cut -d '"' -f4)
 
 if [[ "$github_login" != "$expected_user" ]]; then
-  echo "❌ Token does not match the username provided."
-  echo "    Expected: $expected_user"
-  echo "    Found:    ${github_login:-none}"
+  echo -e "❌ ${RED}Token does not match the username provided."
+  echo -e "    Expected: $expected_user"
+  echo -e "    Found:    ${github_login:-none}${NC}"
   exit 1
 fi
 
@@ -109,14 +129,14 @@ for file in "${files[@]}"; do
   
   if ! curl -sSfL -H "Authorization: token $TOKEN" \
       "$base_url/modules/$file" -o "$out_path"; then
-    echo "❌ Failed to fetch $file. Check your token or network."
+    echo -e "❌ ${RED}Failed to fetch $file. Check your token or network.${NC}"
     exit 1
   fi
 
   chmod +x "$out_path"
 done
 
-#Download the main subspace script
+# Download the main subspace script
 curl -sSfL -H "Authorization: token $TOKEN" "$base_url/subspace.sh" -o "$scripts_dir/subspace"
 chmod +x "$scripts_dir/subspace"
 
@@ -124,9 +144,10 @@ echo
 echo "✅ Modules downloaded to $modules_dir"
 
 echo
-echo "✅ Subspace scripts installed to ./scripts"
+echo -e "✅ ${GREEN}Subspace scripts installed to ./scripts${NC}"
 echo "🧠 'subspace' is now available to use while in this folder"
 
-# Reload shell config silently
-exec bash
-
+echo
+echo "To start using subspace immediate, run:"
+echo
+echo "  source ~/$shell_type"
