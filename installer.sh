@@ -85,35 +85,50 @@ direnv allow
 
 ## GITHUB AUTHENTICATION ##
 
-# Prompt for GitHub username
-read -rp "👤 Enter your GitHub username: " expected_user
+github_user_name=""
+github_token=""
 
-# Ask for GitHub token
-read -rsp "🔐 Enter GitHub Fine-Grained Personal Access Token: " TOKEN
-echo
+if [ ! -f "$project_root/github.env" ]; then
+  # Prompt for GitHub username
+  read -rp "👤 Enter your GitHub username: " github_user_name
 
-# Validate token
-echo "🔍 Validating token ..."
+  # Ask for GitHub token
+  read -rsp "🔐 Enter GitHub Fine-Grained Personal Access Token: " github_token
+  echo
 
-user_response=$(curl -s -H "Authorization: token $TOKEN" https://api.github.com/user)
-github_login=$(echo "$user_response" | grep '"login"' | cut -d '"' -f4)
+  # Validate token
+  echo "🔍 Validating token ..."
 
-if [[ "$github_login" != "$expected_user" ]]; then
-  echo -e "❌ ${RED}Token does not match the username provided."
-  echo -e "    Expected: $expected_user"
-  echo -e "    Found:    ${github_login:-none}${NC}"
-  exit 1
+  user_response=$(curl -s -H "Authorization: token $github_token" https://api.github.com/user)
+  github_login=$(echo "$user_response" | grep '"login"' | cut -d '"' -f4)
+
+  if [[ "$github_login" != "$github_user_name" ]]; then
+    echo -e "❌ ${RED}Token does not match the username provided."
+    echo -e "    Expected: $github_user_name"
+    echo -e "    Found:    ${github_login:-none}${NC}"
+    exit 1
+  fi
+
+  echo "✅ Authenticated as $github_login"
+
+  # Save token to github.env
+  echo "💾 Saving credentials to $dotenv"
+
+  {
+    echo "TOKEN=\"$github_token\""
+    echo "GITHUB_LOGIN=\"$github_login\""
+  } > "$dotenv"
+else
+  echo -e "📄 ${YELLOW}Github credentials already exist. Will use existing credentials${NC}"
+
+  regexp=$(grep '^GITHUB_LOGIN=' github.env)
+  github_user_name="${regexp#*=}"
+  github_user_name="${github_user_name//\"/}"
+  
+  regexp=$(grep '^TOKEN=' github.env)
+  github_token="${regexp#*=}"
+  github_token="${github_token//\"/}"
 fi
-
-echo "✅ Authenticated as $github_login"
-
-# Save token to github.env
-echo "💾 Saving credentials to $dotenv"
-
-{
-  echo "TOKEN=\"$TOKEN\""
-  echo "GITHUB_LOGIN=\"$github_login\""
-} > "$dotenv"
 
 ## DOWNLOAD MODULES ##
 
@@ -128,7 +143,7 @@ for file in "${files[@]}"; do
 
   echo "⬇️  Fetching $file ..."
   
-  if ! curl -sSfL -H "Authorization: token $TOKEN" \
+  if ! curl -sSfL -H "Authorization: Bearer $github_token" \
       "$base_url/modules/$file" -o "$out_path"; then
     echo -e "❌ ${RED}Failed to fetch $file. Check your token or network.${NC}"
     exit 1
@@ -138,7 +153,7 @@ for file in "${files[@]}"; do
 done
 
 # Download the main subspace script
-curl -sSfL -H "Authorization: token $TOKEN" "$base_url/subspace.sh" -o "$scripts_dir/subspace"
+curl -sSfL -H "Authorization: token $github_token" "$base_url/subspace.sh" -o "$scripts_dir/subspace"
 chmod +x "$scripts_dir/subspace"
 
 echo
@@ -146,9 +161,10 @@ echo "✅ Modules downloaded to $modules_dir"
 
 echo
 echo -e "✅ ${GREEN}Subspace scripts installed to ./scripts${NC}"
+echo
 echo "🧠 'subspace' is now available to use while in this folder"
 
 echo
 echo "To start using subspace immediate, run:"
 echo
-echo "  source ~/$shell_type"
+echo "  source $shell_rc"
