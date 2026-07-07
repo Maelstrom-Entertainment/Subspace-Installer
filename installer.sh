@@ -61,7 +61,7 @@ case "$shell_name" in
 esac
 
 # Ensure the shell exists
-if [[ -n "$shell_rc" ]]; then
+if [[ -z "$shell_rc" ]]; then
     echo -e "${RED}Could not detect shell config file."
     echo -e "Please manually add direnv hook to your shell.${NC}"
     exit 1
