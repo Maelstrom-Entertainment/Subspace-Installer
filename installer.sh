@@ -43,7 +43,8 @@ echo "🔧 Checking required packages ..."
 install_package curl
 install_package direnv
 
-shell_name="$(basename "$SHELL")"
+shell_base="$(getent passwd "$USER" | cut -d: -f7)"
+shell_name="$(basename $shell_base)"
 
 # Detect the shell
 case "$shell_name" in
