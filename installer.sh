@@ -130,6 +130,36 @@ else
   github_token="${github_token//\"/}"
 fi
 
+## ONLINE vs OFFLINE MODE ##
+
+# Ask for deployment mode
+read -rp "⚙️ Is this instance of Subspace a local deployment? (y/n): " is_local
+
+case "$is_local" in
+  [Yy])
+    environment="online"
+    ;;
+  [Nn])
+    environment="offline"
+    ;;
+  *)
+    echo "Please answer y or n."
+    ;;
+esac
+
+echo "🌎 Selected environment: ${GREEN}$environment${NC}"
+
+subspace_env_file="$project_root/.env.${environment}"
+
+# Create the appropriate environment file
+cat > "$subspace_env_file" <<EOF
+VITE_CONSOLE_DEBUG=false
+VITE_ENVIRONMENT=${environment}
+
+EOF
+
+echo "Created ${subspace_env_file}"
+
 ## DOWNLOAD MODULES ##
 
 echo "📁 Downloading Subspace modules from $repo@$branch ..."
