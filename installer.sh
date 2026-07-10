@@ -137,17 +137,17 @@ read -rp "⚙️ Is this instance of Subspace a local deployment? (y/n): " is_lo
 
 case "$is_local" in
   [Yy])
-    environment="online"
+    environment="offline"
     ;;
   [Nn])
-    environment="offline"
+    environment="online"
     ;;
   *)
     echo "Please answer y or n."
     ;;
 esac
 
-echo "🌎 Selected environment: ${GREEN}$environment${NC}"
+echo -e "🌎 Selected environment: ${GREEN}$environment${NC}"
 
 subspace_env_file="$project_root/.env.${environment}"
 
